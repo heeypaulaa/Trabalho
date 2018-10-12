@@ -1,9 +1,14 @@
 package visao;
 
+import controle.CentralDeDados;
+
 public class Principal {
 
 	public static void main(String[] args) {
-		CadastrarEleitor c = new CadastrarEleitor();
+		CentralDeDados cd = new CentralDeDados();
+		CadastrarEleitor c = new CadastrarEleitor(cd);
+		//CadastrarCandidato c = new CadastrarCandidato(cd);
+		//CadastrarPartido c = new CadastrarPartido(cd);
 
 	}
 

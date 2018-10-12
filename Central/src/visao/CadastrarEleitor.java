@@ -2,14 +2,19 @@ package visao;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.ImageFilter;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -17,13 +22,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileView;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import controle.CentralDeDados;
 
 public class CadastrarEleitor extends JFrame{
 	
 	private JPanel left;
-	private JPanel right;
 	private JPanel bottom;
 	
 	private GridBagLayout layout;
@@ -45,12 +50,19 @@ public class CadastrarEleitor extends JFrame{
 	private JButton btnCadastrar;
 	private JButton btnLimpar;
 	
-	public CadastrarEleitor() {
+	private GridBagConstraints gbc1;
+	
+	CentralDeDados c;
+	
+	public CadastrarEleitor(CentralDeDados c) {
 		super("Cadastrar Eleitor");
+		
+		this.c = new CentralDeDados();
+		this.c = c;
 		
 		/********** TOP ***********/
 		layout = new GridBagLayout();
-		GridBagConstraints gbc1 = new GridBagConstraints();
+		gbc1 = new GridBagConstraints();
 		
 		left = new JPanel();
 		left.setLayout(layout);
@@ -68,32 +80,36 @@ public class CadastrarEleitor extends JFrame{
 		gbc1.gridx=0; gbc1.gridy=1;
 		left.add(lblCPF,gbc1);
 		
-		txtCPF = new JTextField("CPF", 14);
+		txtCPF = new JTextField(14);
 		gbc1.gridx=1; 
-		txtCPF.setEnabled(false);
+		txtCPF.setEnabled(true);
 		left.add(txtCPF, gbc1);
 		
 		lblTituloEleitor = new JLabel("Título de Eleitor:");
 		gbc1.gridx=0; gbc1.gridy=2;
 		left.add(lblTituloEleitor, gbc1);
 		
-		txtTituloEleitor = new JTextField("Título de Eleitor",14);
+		txtTituloEleitor = new JTextField(14);
 		gbc1.gridx=1;
-		txtTituloEleitor.setEnabled(false);
+		txtTituloEleitor.setEnabled(true);
 		left.add(txtTituloEleitor, gbc1);
 		
 		lblSecao = new JLabel("Seção:");
 		gbc1.gridx=0; gbc1.gridy=3;
 		left.add(lblSecao, gbc1);
 		
-		txtSecao = new JTextField("Seção", 5);
+		txtSecao = new JTextField(5);
 		gbc1.gridx=1;
 		txtSecao.setEnabled(false);
 		left.add(txtSecao, gbc1);
 		
+		Evento evento = new Evento();
+		
 		btnFoto = new JButton("Selecionar Foto");
 		gbc1.gridx = 0; gbc1.gridy=4;
 		left.add(btnFoto, gbc1);
+		
+		btnFoto.addActionListener(evento);
 		
 		this.add(left, BorderLayout.CENTER);
 		
@@ -123,35 +139,74 @@ public class CadastrarEleitor extends JFrame{
 			JFileChooser fchFoto;
 			
 			if (e.getSource() == btnCadastrar) {
-				//System.out.println(txtNome.getText() +" - - " + txtNumero.getText());
-				
-				//boolean r = c.cadastrarPartidos(txtNome.getText(), Integer.parseInt(txtNumero.getText()) );
+				boolean r = c.cadastrarEleitor(Integer.parseInt(txtTituloEleitor.getText()), 
+						txtNome.getText(), txtCPF.getText(), null, Integer.parseInt(txtSecao.getText()));
 				//System.out.println(c.toString());
-				txtNome.setText("");
+				//txtNome.setText("");
 				//txtNumero.setText("");
-				//if (r == true)
+				if (r == true)
 					//System.out.println("Partido político Cadastrado");
-					JOptionPane.showMessageDialog(null, null, "Partido político Cadastrado", NORMAL);
-				//else
+					JOptionPane.showMessageDialog(null, "Eleitor Cadastrado");
+				else
 					//System.out.println("ERRO: Nome ou número já está cadastrado");
-					JOptionPane.showMessageDialog(null, null, "ERRO: Nome ou número já está cadastrado", ERROR);
+					JOptionPane.showMessageDialog(null, "ERRO: CPF já existente");
 				
 			}
 			if (e.getSource() == btnLimpar) {
-				txtNome.setText("");
-				//txtNumero.setText("");
+				txtNome.setText("Nome");
+				txtCPF.setText("CPF");
+				txtSecao.setText("Secao");
+				txtTituloEleitor.setText("Título de Eleitor");
 				
 			}
 			if (e.getSource() == btnFoto) {
-				fchFoto = new JFileChooser();
-				
+				fchFoto = new JFileChooser("/home/paulacunha/eclipse-workspace/Central/bin/visao");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				        "PPM Images", "ppm");  //Cria um filtro
 				//filtro somente para fotos
-				//fchFoto.addChoosableFileFilter();
-				fchFoto.setAcceptAllFileFilterUsed(false);
+				fchFoto.setFileFilter(filter);
 				
-				//adiciona icones padrões
-				fchFoto.setFileView(FileView);
 				
+				
+				
+				
+//				final JPanel preview = new JPanel();
+//				preview.setPreferredSize(new Dimension(150, 150));
+//				addPropertyChangeListener(new PropertyChangeListener() {
+//					
+//					@Override
+//					public void propertyChange(PropertyChangeEvent e) {
+//						String propertyName = e.getPropertyName();
+//				        if (propertyName.equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)){
+//				        	File selection = (File) e.getNewValue();
+//				        	String name;
+//				        	if (selection == null)
+//				        		return;
+//				        	else
+//				        		name = selection.getAbsolutePath();
+//				        	Icon newImage = new ImageIcon(name);
+//				        	preview.set(Image)newImage);
+//				        }
+//		            }
+//				});
+
+				
+				
+				
+				
+				
+				
+				//Abre o diálogo JFileChooser
+				int returnVal = fchFoto.showOpenDialog(getParent()); 
+				
+				//Verifica se o usuário clicou no botão OK
+				if(returnVal == JFileChooser.APPROVE_OPTION) {  
+					//Apresenta uma mensagem informando o nome do arquivo/diretório selecionado
+					icnImagemRosto = new ImageIcon(fchFoto.getSelectedFile().getAbsolutePath());
+					lblImagemRosto = new JLabel(icnImagemRosto);
+					gbc1.gridx = 4; gbc1.gridy=0;
+					left.add(lblImagemRosto, gbc1);
+				}
 			}
 
 		}

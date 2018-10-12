@@ -11,7 +11,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,7 +23,6 @@ import controle.CentralDeDados;
 public class CadastrarPartido extends JFrame{
 	
 	private JPanel left;
-	private JPanel right;
 	private JPanel bottom;
 	
 	private GridBagLayout layout;
@@ -38,11 +36,13 @@ public class CadastrarPartido extends JFrame{
 	
 	private JButton btnCadastrar;
 	private JButton btnLimpar;
-	private JButton btnCancelar;
-	private CentralDeDados c = new CentralDeDados();
+	private CentralDeDados c;
 	
-	public CadastrarPartido() {
+	public CadastrarPartido(CentralDeDados c) {
 		super("Cadastrar Partido");
+		
+		this.c = new CentralDeDados();
+		this.c = c;
 		
 		/********** TOP ***********/
 		layout = new GridBagLayout();
@@ -76,10 +76,7 @@ public class CadastrarPartido extends JFrame{
 		
 		bottom = new JPanel();
 		bottom.setLayout(layoutSul);
-		
-//		btnCancelar = new JButton("Cancelar");
-//		bottom.add(btnCancelar);
-		
+				
 		btnLimpar = new JButton("Limpar");
 		btnLimpar.setEnabled(true);
 		bottom.add(btnLimpar);
@@ -114,11 +111,11 @@ public class CadastrarPartido extends JFrame{
 				txtNome.setText("");
 				txtNumero.setText("");
 				if (r == true)
-					//System.out.println("Partido político Cadastrado");
-					JOptionPane.showMessageDialog(null, null, "Partido político Cadastrado", NORMAL);
+					//JOptionPane.showm
+					JOptionPane.showMessageDialog(null, "Partido político Cadastrado");
 				else
-					//System.out.println("ERRO: Nome ou número já está cadastrado");
-					JOptionPane.showMessageDialog(null, null, "ERRO: Nome ou número já está cadastrado", ERROR);
+					//System.err.println("ERRO: Nome ou número já está cadastrado");
+					JOptionPane.showMessageDialog(null, "ERRO: Nome ou número já está cadastrado");
 				
 			}
 			if (e.getSource() == btnLimpar) {

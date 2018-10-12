@@ -8,28 +8,36 @@ import modelo.Voto;
 
 public class CentralDeDados {
 	
-	private Eleitor[] eleitores;
-	private Candidato[] candidatos;
-	private PartidoPolitico[] partidos;
+	private Eleitor[] eleitores = new Eleitor[50];
+	private Candidato[] candidatos = new Candidato[50];
+	private PartidoPolitico[] partidos = new PartidoPolitico[50];
 	private Voto votos[];
 	
 	public CentralDeDados() {
-		partidos = new PartidoPolitico[50];
+		
 	}
 	
-//	public void cadastrarEleitores(int tituloEleitor, String nome, 
-//			String cpf, String imagemRosto, int sessao) {
-//		
-//		for (int i = 0; i < this.eleitores.length; i++) {
-//			if(this.eleitores[i] == null) {
-//				this.eleitores[i] = new Eleitor(tituloEleitor, nome, cpf, imagemRosto, sessao);
-//			}
-//			else {
-//				if(this.eleitores[i].getCpf().equals(cpf))
-//					return;
-//			}
-//		}
-//	}
+	public boolean cadastrarEleitor(int tituloEleitor, String nome, 
+			String cpf, String imagemRosto, int sessao) {
+		for (int i = 0; i < eleitores.length; i++) {
+			if (eleitores[i] != null) {
+				if(eleitores[i].getCpf().equals(cpf)) {
+					System.out.println("igual");
+					return false;
+				}
+			}
+			else {
+				eleitores[i] = new Eleitor();
+				eleitores[i].setNome(nome);
+				eleitores[i].setCpf(cpf);
+				eleitores[i].setSessao(sessao);
+				eleitores[i].setTituloEleitor(tituloEleitor);
+				eleitores[i].setImagemRosto(imagemRosto);
+				return true;
+			}
+		}
+		return false;
+	}
 //	
 //	public void cadastrarCandidato(String nome, int numero, 
 //			String cpf, PartidoPolitico partido) {
@@ -46,18 +54,17 @@ public class CentralDeDados {
 //	}
 	
 	public boolean cadastrarPartidos(String nome, int numero) {
-		
-		for (int i = 0; i < this.partidos.length; i++) {
-			if (this.partidos[i] != null) {
-				if(this.partidos[i].getNome().equals(nome) || (this.partidos[i].getNumero() == numero)) {
+		for (int i = 0; i < partidos.length; i++) {
+			if (partidos[i] != null) {
+				if(partidos[i].getNome().equals(nome) || (partidos[i].getNumero() == numero)) {
 					System.out.println("igual");
 					return false;
 				}
 			}
 			else {
-				this.partidos[i] = new PartidoPolitico();
-				this.partidos[i].setNome(nome);
-				this.partidos[i].setNumero(numero);
+				partidos[i] = new PartidoPolitico();
+				partidos[i].setNome(nome);
+				partidos[i].setNumero(numero);
 				return true;
 			}
 		}
