@@ -6,9 +6,12 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ColorModel;
 import java.awt.image.ImageFilter;
+import java.awt.image.MemoryImageSource;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -25,14 +28,17 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import controle.CentralDeDados;
+import image.*;
 
 public class CadastrarEleitor extends JFrame{
 	
 	private JPanel left;
+	private JPanel right;
 	private JPanel bottom;
 	
 	private GridBagLayout layout;
 	private GridBagLayout layoutSul;
+	private GridBagLayout layoutRight;
 	
 	private JLabel lblNome;
 	private JLabel lblCPF;
@@ -49,6 +55,10 @@ public class CadastrarEleitor extends JFrame{
 	private JButton btnFoto;
 	private JButton btnCadastrar;
 	private JButton btnLimpar;
+	
+	private String imagePath;
+	private String nomeImage = "";
+	private PGMImage image;
 	
 	private GridBagConstraints gbc1;
 	
@@ -71,7 +81,7 @@ public class CadastrarEleitor extends JFrame{
 		gbc1.gridx=0; gbc1.gridy=0;
 		left.add(lblNome, gbc1);
 		
-		txtNome = new JTextField(30);
+		txtNome = new JTextField(20);
 		gbc1.gridx=1;
 		txtNome.setEnabled(true);
 		left.add(txtNome, gbc1);
@@ -100,7 +110,7 @@ public class CadastrarEleitor extends JFrame{
 		
 		txtSecao = new JTextField(5);
 		gbc1.gridx=1;
-		txtSecao.setEnabled(false);
+		//txtSecao.setEnabled(false);
 		left.add(txtSecao, gbc1);
 		
 		Evento evento = new Evento();
@@ -112,6 +122,20 @@ public class CadastrarEleitor extends JFrame{
 		btnFoto.addActionListener(evento);
 		
 		this.add(left, BorderLayout.CENTER);
+		
+		/************* Direita ***********/
+		layoutRight = new GridBagLayout();
+		
+		right = new JPanel();
+		//right.setBackground(Color.GREEN);
+		
+		icnImagemRosto = new ImageIcon();
+		lblImagemRosto = new JLabel(icnImagemRosto);
+		
+		 //* rig
+		
+		right.add(lblImagemRosto);
+		this.add(right, BorderLayout.EAST);
 		
 		/************* SUL ***********/
 		layoutSul = new GridBagLayout();
@@ -126,89 +150,73 @@ public class CadastrarEleitor extends JFrame{
 		bottom.add(btnCadastrar);
 		this.add(bottom, BorderLayout.SOUTH);
 		
+		btnCadastrar.addActionListener(evento);
+		btnLimpar.addActionListener(evento);
+		
 		setSize(800,500);
 		setLocationRelativeTo(null);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);		
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
 	}
-
+	
+	public void draw() {
+        MemoryImageSource source = new MemoryImageSource(image.getWidth(), image.getHeight(), ColorModel.getRGBdefault(), image.toRGBModel(), 0, image.getWidth());
+        Image img =Toolkit.getDefaultToolkit().createImage(source);
+        this.remove(lblImagemRosto);
+        lblImagemRosto = new JLabel (new ImageIcon(img));
+        gbc1.gridx = 4; gbc1.gridy=0;
+    	right.add(lblImagemRosto, gbc1);
+        //this.add(lblImagemRosto, BorderLayout.CENTER);
+        this.validate();   
+    }
+	
 	private class Evento implements ActionListener{
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser fchFoto;
-			
 			if (e.getSource() == btnCadastrar) {
+				System.out.println("aqui C "+ nomeImage);
+				if (!(nomeImage.equals(""))) {
+				System.out.println("aqui C2");
 				boolean r = c.cadastrarEleitor(Integer.parseInt(txtTituloEleitor.getText()), 
-						txtNome.getText(), txtCPF.getText(), null, Integer.parseInt(txtSecao.getText()));
-				//System.out.println(c.toString());
-				//txtNome.setText("");
-				//txtNumero.setText("");
+						txtNome.getText(), txtCPF.getText(), nomeImage, Integer.parseInt(txtSecao.getText()));
 				if (r == true)
-					//System.out.println("Partido político Cadastrado");
 					JOptionPane.showMessageDialog(null, "Eleitor Cadastrado");
 				else
-					//System.out.println("ERRO: Nome ou número já está cadastrado");
 					JOptionPane.showMessageDialog(null, "ERRO: CPF já existente");
-				
+				}	
 			}
 			if (e.getSource() == btnLimpar) {
-				txtNome.setText("Nome");
-				txtCPF.setText("CPF");
-				txtSecao.setText("Secao");
-				txtTituloEleitor.setText("Título de Eleitor");
+				txtNome.setText("");
+				txtCPF.setText("");
+				txtSecao.setText("");
+				txtTituloEleitor.setText("");
+				remove(lblImagemRosto);
 				
 			}
 			if (e.getSource() == btnFoto) {
 				fchFoto = new JFileChooser("/home/paulacunha/eclipse-workspace/Central/bin/visao");
-				FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				        "PPM Images", "ppm");  //Cria um filtro
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("PPM Images", "ppm");  //Cria um filtro
 				//filtro somente para fotos
 				fchFoto.setFileFilter(filter);
-				
-				
-				
-				
-				
-//				final JPanel preview = new JPanel();
-//				preview.setPreferredSize(new Dimension(150, 150));
-//				addPropertyChangeListener(new PropertyChangeListener() {
-//					
-//					@Override
-//					public void propertyChange(PropertyChangeEvent e) {
-//						String propertyName = e.getPropertyName();
-//				        if (propertyName.equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)){
-//				        	File selection = (File) e.getNewValue();
-//				        	String name;
-//				        	if (selection == null)
-//				        		return;
-//				        	else
-//				        		name = selection.getAbsolutePath();
-//				        	Icon newImage = new ImageIcon(name);
-//				        	preview.set(Image)newImage);
-//				        }
-//		            }
-//				});
-
-				
-				
-				
-				
-				
-				
 				//Abre o diálogo JFileChooser
-				int returnVal = fchFoto.showOpenDialog(getParent()); 
-				
+				int returnVal = fchFoto.showOpenDialog(getParent());
 				//Verifica se o usuário clicou no botão OK
-				if(returnVal == JFileChooser.APPROVE_OPTION) {  
-					//Apresenta uma mensagem informando o nome do arquivo/diretório selecionado
-					icnImagemRosto = new ImageIcon(fchFoto.getSelectedFile().getAbsolutePath());
-					lblImagemRosto = new JLabel(icnImagemRosto);
-					gbc1.gridx = 4; gbc1.gridy=0;
-					left.add(lblImagemRosto, gbc1);
+				if(returnVal == JFileChooser.APPROVE_OPTION) {
+					nomeImage = fchFoto.getSelectedFile().getName();
+					imagePath=fchFoto.getSelectedFile().getAbsolutePath();
+					if (imagePath.toLowerCase().matches(".+\\.pgm")) {
+	                    image=PGMFileReader.readImage(imagePath);
+	                }
+	                else if (imagePath.toLowerCase().matches(".+\\.ppm")) {
+	                    image=PPMFileReader.readImage(imagePath).convertToPGM();
+	                }
 				}
+				if(image != null) {
+		            draw();
+		        }
 			}
-
+			
 		}
 		
 	}

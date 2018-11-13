@@ -5,11 +5,9 @@ import controle.CentralDeDados;
 public class Principal {
 
 	public static void main(String[] args) {
-		CentralDeDados cd = new CentralDeDados();
-		CadastrarEleitor c = new CadastrarEleitor(cd);
-		//CadastrarCandidato c = new CadastrarCandidato(cd);
-		//CadastrarPartido c = new CadastrarPartido(cd);
-
+		CentralDeDados c = new CentralDeDados("eleitores.json", "candidatos.json", "partidos.json","votos.json");
+		
+		new TelaPrincipal(c);
 	}
 
 }

@@ -95,7 +95,7 @@ public class CadastrarPartido extends JFrame{
 		setSize(300,200);
 		setLocationRelativeTo(null);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);		
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
 	}
 	
 	private class Evento implements ActionListener{

@@ -5,12 +5,13 @@ public class Candidato {
 	private String nome;
 	private int numero;
 	private String cpf;
-	private PartidoPolitico partido;
-	
+	public PartidoPolitico partido;
+
 	public Candidato(String nome, int numero, String cpf, PartidoPolitico partido) {
 		this.nome = nome;
 		this.numero = numero;
 		this.cpf = cpf;
+		this.partido = new PartidoPolitico();
 		this.partido = partido;
 	}
 
@@ -32,7 +33,7 @@ public class Candidato {
 	}
 	
 	public PartidoPolitico getPartido() {
-		return this.partido;
+		return partido;
 	}
 	
 	/* SET */

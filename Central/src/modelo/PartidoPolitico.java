@@ -36,5 +36,13 @@ public class PartidoPolitico {
 	public String toString() {
 		return "Nome: "+getNome()+" Numero: "+getNumero();
 	}
+	
+	public boolean equals(PartidoPolitico p) {
+		if(p != null) 
+			return false;
+		else 
+			return ((this.numero == p.getNumero()) && this.nome.equals(p.nome));
+	}
+
 
 }

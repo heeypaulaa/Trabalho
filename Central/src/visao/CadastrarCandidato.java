@@ -3,18 +3,27 @@ package visao;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.Icon;
+//import javax.swing.Icon;
 import javax.swing.JButton;
+//import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+//import javax.swing.filechooser.FileNameExtensionFilter;
+
+import controle.CentralDeDados;
+//import image.PGMFileReader;
+//import image.PPMFileReader;
 
 public class CadastrarCandidato extends JFrame{
 	
 	private JPanel left;
-	private JPanel right;
+	//private JPanel right;
 	private JPanel bottom;
 	
 	private GridBagLayout layout;
@@ -22,7 +31,7 @@ public class CadastrarCandidato extends JFrame{
 	
 	private JLabel lblNome;
 	private JLabel lblCPF;
-	private JLabel lblImagemRosto;
+	//private JLabel lblImagemRosto;
 	private JLabel lblPartido;
 	private JLabel lblNumero;
 	
@@ -30,14 +39,18 @@ public class CadastrarCandidato extends JFrame{
 	private JTextField txtCPF;
 	private JTextField txtPartido;
 	private JTextField txtNumero;
-	private Icon icnImagemRosto;
+	//private Icon icnImagemRosto;
 	
 	private JButton btnCadastrar;
 	private JButton btnLimpar;
-	private JButton btnCancelar;
 	
-	public CadastrarCandidato() {
+	private CentralDeDados c;
+	
+	public CadastrarCandidato(CentralDeDados c) {
 		super("Cadastrar Candidato");
+		
+		this.c = new CentralDeDados();
+		this.c = c;
 		
 		/********** TOP ***********/
 		layout = new GridBagLayout();
@@ -50,9 +63,9 @@ public class CadastrarCandidato extends JFrame{
 		gbc1.gridx=0; gbc1.gridy=0;
 		left.add(lblNome, gbc1);
 		
-		txtNome = new JTextField(30);
+		txtNome = new JTextField(20);
 		gbc1.gridx=1;
-		txtNome.setEnabled(true);
+		//txtNome.setEnabled(true);
 		left.add(txtNome, gbc1);
 		
 		lblCPF = new JLabel("CPF:");
@@ -61,7 +74,7 @@ public class CadastrarCandidato extends JFrame{
 		
 		txtCPF = new JTextField("CPF", 14);
 		gbc1.gridx=1; 
-		txtCPF.setEnabled(false);
+		//txtCPF.setEnabled(false);
 		left.add(txtCPF, gbc1);
 		
 		lblNumero = new JLabel("Número:");
@@ -73,7 +86,7 @@ public class CadastrarCandidato extends JFrame{
 		txtNumero.setEnabled(true);
 		left.add(txtNumero, gbc1);
 		
-		lblPartido = new JLabel("Paritido Político:");
+		lblPartido = new JLabel("Nome do Partido Político:");
 		gbc1.gridx=0; gbc1.gridy=3;
 		left.add(lblPartido, gbc1);
 		
@@ -90,11 +103,7 @@ public class CadastrarCandidato extends JFrame{
 		
 		bottom = new JPanel();
 		bottom.setLayout(layoutSul);
-		
-		btnCancelar = new JButton("Cancelar");
-		btnCancelar.setEnabled(true);
-		bottom.add(btnCancelar);
-		
+				
 		btnLimpar = new JButton("Limpar");
 		bottom.add(btnLimpar);
 		
@@ -102,10 +111,45 @@ public class CadastrarCandidato extends JFrame{
 		bottom.add(btnCadastrar);
 		this.add(bottom, BorderLayout.SOUTH);
 		
+		Evento evento = new Evento();
+		
+		btnCadastrar.addActionListener(evento);
+		btnLimpar.addActionListener(evento);
+		
 		setSize(800,500);
 		setLocationRelativeTo(null);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);		
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
+	}
+	
+	private class Evento implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {			
+			if (e.getSource() == btnCadastrar) {
+				txtPartido.setText(c.getPartido(Integer.parseInt(txtNumero.getText())).getNome());
+				
+				System.out.println(txtNome.getText() +" - - " + txtNumero.getText());
+
+				boolean r = c.cadastrarCandidato(txtNome.getText(), Integer.parseInt(txtNumero.getText()),
+						txtCPF.getText(), txtPartido.getText());
+				//System.out.println(c.toString());
+				if (r == true)
+					//JOptionPane.showm
+					JOptionPane.showMessageDialog(null, "Candidato Cadastrado");
+//				else
+//					//System.err.println("ERRO: Nome ou número já está cadastrado");
+//					JOptionPane.showMessageDialog(null, "ERRO: Nome ou número já está cadastrado");
+			}
+			if (e.getSource() == btnLimpar) {
+				txtNome.setText("");
+				txtCPF.setText("");
+				txtNumero.setText("");
+				txtPartido.setText("");			
+			}
+			
+			
+		}
+		
 	}
 
 
