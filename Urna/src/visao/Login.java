@@ -1,16 +1,36 @@
+/**
+ * @author paulacunha
+ *
+ **/
+
 package visao;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.ColorModel;
+import java.awt.image.MemoryImageSource;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import controle.Urna;
+import image.PGMFileReader;
+import image.PGMImage;
+import image.PPMFileReader;
+import modelo.Eleitor;
 
 public class Login extends JFrame{
 	
@@ -37,14 +57,27 @@ public class Login extends JFrame{
 	private JButton btnConfirma;
 	private JButton btnCorrige;
 	private JButton btnBranco;
+	private JButton btnFoto;
 	
+	private String imagePath;
+	private String nomeImage = "";
+	private PGMImage image;
 	
-	public Login() {
+	private GridBagConstraints gbc1;
+	private Eleitor eleitor = new Eleitor();
+	
+	private Urna u;
+	
+	public Login(Urna u) {
 		super("Login");
+		this.u = new Urna();
+		this.u = u;
+		System.out.println("construtor Login");
+		System.out.println("secao"+this.u.getSecao());
 		
 		/********** LEFT ***********/
 		layoutLeft = new GridBagLayout();
-		GridBagConstraints gbc1 = new GridBagConstraints();
+		gbc1 = new GridBagConstraints();
 		
 		left = new JPanel();
 		left.setLayout(layoutLeft);
@@ -87,6 +120,13 @@ public class Login extends JFrame{
 		txtSecao.setEnabled(false);
 		left.add(txtSecao, gbc1);
 		
+		btnFoto = new JButton("Selecionar foto");
+		gbc1.gridx = 0; gbc1.gridy=4;
+		left.add(btnFoto, gbc1);
+		
+		Evento e = new Evento();
+		btnFoto.addActionListener(e);
+		
 		this.add(left, BorderLayout.WEST);
 		
 		/********* DIREITA ************/
@@ -94,19 +134,19 @@ public class Login extends JFrame{
 		//setLayout(layoutRight);
 		
 		right = new JPanel();
-		right.setLayout(layoutRight);
-		right.setBackground(Color.GREEN);
-		/*
-		 * icnImagemRosto = new ImageIcon(getClass().getResource(arg0));
-		 * rig
-		*/
-		//right.add(txtSecao);
+		//right.setBackground(Color.GREEN);
+		
+		icnImagemRosto = new ImageIcon();
+		lblImagemRosto = new JLabel(icnImagemRosto);
+		
+		//* rig
+		
+		right.add(lblImagemRosto);
 		this.add(right, BorderLayout.EAST);
 		
 		
 		/************* SUL ***********/
 		layoutBottom = new GridBagLayout();
-		//setLayout(layoutBottom);
 		
 		bottom = new JPanel();
 		bottom.setLayout(layoutBottom);
@@ -126,11 +166,82 @@ public class Login extends JFrame{
 		bottom.add(btnConfirma);
 		this.add(bottom, BorderLayout.PAGE_END);
 		
+		btnConfirma.addActionListener(e);
+		btnCorrige.addActionListener(e);
+		btnFoto.addActionListener(e);
+		
 		setSize(800,500);
 		setLocationRelativeTo(null);
 		setVisible(true);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);		
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
 	}
 	
+	public void draw() {
+        MemoryImageSource source = new MemoryImageSource(image.getWidth(), image.getHeight(), ColorModel.getRGBdefault(), image.toRGBModel(), 0, image.getWidth());
+        Image img =Toolkit.getDefaultToolkit().createImage(source);
+        //lblImagemRosto.setIcon(null);
+        this.remove(lblImagemRosto);
+        lblImagemRosto = new JLabel(new ImageIcon(img));
+        gbc1.gridx = 4; gbc1.gridy=0;
+    	right.add(lblImagemRosto, gbc1);
+        //this.add(lblImagemRosto, BorderLayout.CENTER);
+        this.validate();   
+    }
+	
+	private class Evento implements ActionListener{
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fchFoto;
+			if(e.getSource() == btnConfirma) {
+//				Eleitor el = new Eleitor();
+//				el = u.getEleitor(txtCPF.getText());
+//				new ColherVoto(u, el);
+				new ColherVoto(u,eleitor);
+				//e.setSource(btnCorrige);
+			}
+			if(e.getSource() == btnCorrige) {
+				txtNome.setText("");
+				txtCPF.setText("");
+				txtSecao.setText("");
+				txtTituloEleitor.setText("");
+			}
+			if(e.getSource() == btnFoto) {
+				//System.out.println(getClass().getResource(null).toString());
+				fchFoto = new JFileChooser("/home/paulacunha/eclipse-workspace/Central/bin/visao");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("PPM Images", "ppm");  //Cria um filtro
+				//filtro somente para fotos
+				fchFoto.setFileFilter(filter);
+				//Abre o diálogo JFileChooser
+				int returnVal = fchFoto.showOpenDialog(getParent());
+				//Verifica se o usuário clicou no botão OK
+				if(returnVal == JFileChooser.APPROVE_OPTION) {
+					nomeImage = fchFoto.getSelectedFile().getName();
+					imagePath=fchFoto.getSelectedFile().getAbsolutePath();
+					if (imagePath.toLowerCase().matches(".+\\.pgm")) {
+	                    image=PGMFileReader.readImage(imagePath);
+	                }
+	                else if (imagePath.toLowerCase().matches(".+\\.ppm")) {
+	                    image=PPMFileReader.readImage(imagePath).convertToPGM();
+	                }
+				}
+			}
+			if(image != null) {
+				draw();
+				System.out.println(nomeImage);
+				eleitor = u.getEleitor(nomeImage);
+				System.out.println(u.getSecao());
+				System.out.println("depois");
+
+				if(u.ComparaArqPPM(("/home/paulacunha/eclipse-workspace/Central/bin/visao/"+nomeImage),
+						("/home/paulacunha/eclipse-workspace/Central/bin/visao/"+nomeImage))) {
+					txtNome.setText(eleitor.getNome());
+					txtCPF.setText(eleitor.getCpf());
+					txtSecao.setText(Integer.toString(eleitor.getSessao()));
+					txtTituloEleitor.setText(Integer.toString(eleitor.getTituloEleitor()));
+				}
+	            
+	        }
+		}
+	}
 }

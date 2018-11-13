@@ -33,7 +33,6 @@ public class Eleitor {
 		return this.cpf;
 	}
 	
-	/*arrumar*/
 	public String getImagemRosto() {
 		return this.imagemRosto;
 	}
@@ -55,7 +54,6 @@ public class Eleitor {
 		this.cpf = cpf;
 	}
 	
-	/*arrumar*/
 	public void setImagemRosto(String imagemRosto) {
 		this.imagemRosto = imagemRosto;
 	}
